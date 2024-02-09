@@ -1,4 +1,4 @@
-import { getAuthUserDetails } from "@/lib/queries";
+import { getAuthUserDetails, verifyAndAcceptInvitation } from "@/lib/queries";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -7,7 +7,8 @@ const Page = async () => {
     if (!authUser) return redirect('/sign-in');
 
     const user = await getAuthUserDetails();
-    console.log(user)
+    const agencyId = await verifyAndAcceptInvitation()
+    console.log(agencyId)
     return (
         <div>Agency</div>
     )
