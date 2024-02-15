@@ -1,6 +1,5 @@
-import React from 'react'
-import { getAuthUserDetails } from '../../lib/queries';
-import MenuOptions from './menu-options';
+import { getAuthUserDetails } from '@/lib/queries'
+import MenuOptions from './menu-options'
 
 type Props = {
     id: string
@@ -8,54 +7,61 @@ type Props = {
 }
 
 const Sidebar = async ({ id, type }: Props) => {
-
     const user = await getAuthUserDetails()
     if (!user) return null
 
     if (!user.Agency) return
 
-    const details = type === 'agency' ? user?.Agency : user?.Agency.SubAccount.find((subaccount) => subaccount.id === id)
+    const details =
+        type === 'agency'
+            ? user?.Agency
+            : user?.Agency.SubAccount.find((subaccount) => subaccount.id === id)
 
-    const isWhiteLabelAgency = user.Agency.whiteLabel
+    const isWhiteLabeledAgency = user.Agency.whiteLabel
+    if (!details) return
 
-    if (!details) return null
-    let sideBarLogo = user.Agency.agencyLogo || '/assets/plura-logo.svg';
+    let sideBarLogo = user.Agency.agencyLogo || '/assets/plura-logo.svg'
 
-    if (!isWhiteLabelAgency) {
+    if (!isWhiteLabeledAgency) {
         if (type === 'subaccount') {
-            sideBarLogo = user.Agency.SubAccount.find((subaccount) => subaccount.id === id)
-                ?.subAccountLogo || user.Agency.agencyLogo
+            sideBarLogo =
+                user?.Agency.SubAccount.find((subaccount) => subaccount.id === id)
+                    ?.subAccountLogo || user.Agency.agencyLogo
         }
     }
 
-    const SidebarOpt = type === 'agency' ? user.Agency.SidebarOption || [] 
-    : user.Agency.SubAccount.find((subaccount) => subaccount.id === id) ?.SidebarOption || []
+    const sidebarOpt =
+        type === 'agency'
+            ? user.Agency.SidebarOption || []
+            : user.Agency.SubAccount.find((subaccount) => subaccount.id === id)
+                ?.SidebarOption || []
 
-    const subaccounts = user.Agency.SubAccount.filter((subaccount) => 
-    user.Permissions.find(
-        (permission) => permission.subAccountId === subaccount.id && permission.access
-    ))
-    
+    const subaccounts = user.Agency.SubAccount.filter((subaccount) =>
+        user.Permissions.find(
+            (permission) =>
+                permission.subAccountId === subaccount.id && permission.access
+        )
+    )
+
     return (
         <>
-        <MenuOptions
-        defaultOpen={true}
-        details={details}
-        id={id}
-        sidebarLogo={sideBarLogo}
-        sidebarOpt={SidebarOpt}
-        subAccounts={subaccounts}
-        user={user}
-         />
-        <MenuOptions
-        defaultOpen={true}
-        details={details}
-        id={id}
-        sidebarLogo={sideBarLogo}
-        sidebarOpt={SidebarOpt}
-        subAccounts={subaccounts}
-        user={user}
-         />
+            <MenuOptions
+                defaultOpen={true}
+                details={details}
+                id={id}
+                sidebarLogo={sideBarLogo}
+                sidebarOpt={sidebarOpt}
+                subAccounts={subaccounts}
+                user={user}
+            />
+            <MenuOptions
+                details={details}
+                id={id}
+                sidebarLogo={sideBarLogo}
+                sidebarOpt={sidebarOpt}
+                subAccounts={subaccounts}
+                user={user}
+            />
         </>
     )
 }
