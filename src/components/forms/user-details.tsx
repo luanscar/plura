@@ -7,7 +7,7 @@ import {
   updateUser,
 } from "@/lib/queries";
 import {
-  AuthUserWithAgencySidebarOptionsSubAccounts,
+  AuthUserWithAgencySigebarOptionsSubAccounts,
   UserWithPermissionsAndSubAccounts,
 } from "@/lib/types";
 import { useModal } from "@/providers/modal-provider";
@@ -51,23 +51,25 @@ import { Separator } from "../ui/separator";
 import { Switch } from "../ui/switch";
 
 type Props = {
-  id: string;
+  id: string | null;
   type: "agency" | "subaccount";
   userData?: Partial<User>;
   subAccounts?: SubAccount[];
 };
 
-const UserDetails = ({ id, type, userData, subAccounts }: Props) => {
-  const [subAccountPermissions, setSubAccountPermissions] =
+const UserDetails = ({ id, type, subAccounts, userData }: Props) => {
+  const [subAccountPermissions, setSubAccountsPermissions] =
     useState<UserWithPermissionsAndSubAccounts | null>(null);
 
   const { data, setClose } = useModal();
   const [roleState, setRoleState] = useState("");
   const [loadingPermissions, setLoadingPermissions] = useState(false);
   const [authUserData, setAuthUserData] =
-    useState<AuthUserWithAgencySidebarOptionsSubAccounts>(null);
+    useState<AuthUserWithAgencySigebarOptionsSubAccounts | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+
+  //Get authUSerDtails
 
   useEffect(() => {
     if (data.user) {
@@ -93,6 +95,7 @@ const UserDetails = ({ id, type, userData, subAccounts }: Props) => {
 
   const form = useForm<z.infer<typeof userDataSchema>>({
     resolver: zodResolver(userDataSchema),
+    mode: "onChange",
     defaultValues: {
       name: userData ? userData.name : data?.user?.name,
       email: userData ? userData.email : data?.user?.email,
@@ -106,16 +109,15 @@ const UserDetails = ({ id, type, userData, subAccounts }: Props) => {
     const getPermissions = async () => {
       if (!data.user) return;
       const permission = await getUserPermissions(data.user.id);
-      setSubAccountPermissions(permission);
+      setSubAccountsPermissions(permission);
     };
     getPermissions();
   }, [data, form]);
 
   useEffect(() => {
-    if (!data.user) {
+    if (data.user) {
       form.reset(data.user);
     }
-
     if (userData) {
       form.reset(userData);
     }
@@ -208,7 +210,7 @@ const UserDetails = ({ id, type, userData, subAccounts }: Props) => {
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>User Details</CardTitle>
         <CardDescription>Add or update your information</CardDescription>
@@ -276,7 +278,7 @@ const UserDetails = ({ id, type, userData, subAccounts }: Props) => {
               name="role"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>User Role</FormLabel>
+                  <FormLabel> User Role</FormLabel>
                   <Select
                     disabled={field.value === "AGENCY_OWNER"}
                     onValueChange={(value) => {
