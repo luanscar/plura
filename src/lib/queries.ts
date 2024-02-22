@@ -4,6 +4,7 @@ import { clerkClient, currentUser } from "@clerk/nextjs";
 import { Agency, Plan, SubAccount, User } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { db } from "./db";
+import { v4 } from "uuid";
 
 export const getAuthUserDetails = async () => {
   const user = await currentUser();

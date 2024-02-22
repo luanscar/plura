@@ -70,7 +70,7 @@ const MenuOptions = ({
     >
       <SheetTrigger
         asChild
-        className="absolute left-4 top-4 z-[100] md:!hidden felx"
+        className="absolute left-4 top-4 z-[100] md:!hidden flex"
       >
         <Button
           variant="outline"
@@ -103,14 +103,14 @@ const MenuOptions = ({
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                className="w-full my-4 flex items-center justify-between py-8"
+                className="w-full text-ellipsis overflow-hidden my-4 flex items-center justify-between py-8"
                 variant="ghost"
               >
-                <div className="flex items-center text-left gap-2">
+                <div className="flex  items-center text-left gap-2">
                   <Compass />
-                  <div className="flex flex-col">
+                  <div className="flex  flex-col">
                     {details.name}
-                    <span className="text-muted-foreground">
+                    <span className="md:w-[150px] truncate text-muted-foreground">
                       {details.address}
                     </span>
                   </div>
@@ -123,16 +123,16 @@ const MenuOptions = ({
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 h-80 mt-4 z-[200]">
+            <PopoverContent className="mt-4 z-[200]">
               <Command className="rounded-lg">
                 <CommandInput placeholder="Search Accounts..." />
-                <CommandList className="pb-16">
+                <CommandList className="pb-12">
                   <CommandEmpty> No results found</CommandEmpty>
                   {(user?.role === 'AGENCY_OWNER' ||
                     user?.role === 'AGENCY_ADMIN') &&
                     user?.Agency && (
                       <CommandGroup heading="Agency">
-                        <CommandItem className="!bg-transparent my-2 text-primary broder-[1px] border-border p-2 rounded-md hover:!bg-muted cursor-pointer transition-all">
+                        <CommandItem className="!bg-transparent my-2 text-primary border-[1px] border-border p-2 rounded-md hover:!bg-muted cursor-pointer transition-all">
                           {defaultOpen ? (
                             <Link
                               href={`/agency/${user?.Agency?.id}`}
