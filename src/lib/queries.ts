@@ -3,8 +3,8 @@
 import { clerkClient, currentUser } from "@clerk/nextjs";
 import { Agency, Plan, SubAccount, User } from "@prisma/client";
 import { redirect } from "next/navigation";
-import { db } from "./db";
 import { v4 } from "uuid";
+import { db } from "./db";
 
 export const getAuthUserDetails = async () => {
   const user = await currentUser();
@@ -235,16 +235,16 @@ export const updateUser = async (user: Partial<User>) => {
   const response = await db.user.update({
     where: { email: user.email },
     data: { ...user },
-  })
+  });
 
   await clerkClient.users.updateUserMetadata(response.id, {
     privateMetadata: {
-      role: user.role || 'SUBACCOUNT_USER',
+      role: user.role || "SUBACCOUNT_USER",
     },
-  })
+  });
 
-  return response
-}
+  return response;
+};
 
 export const upsertAgency = async (agency: Agency, price?: Plan) => {
   if (!agency.companyEmail) return null;
@@ -405,5 +405,45 @@ export const getUserPermissions = async (userId: string) => {
     select: { Permissions: { include: { SubAccount: true } } },
   });
 
+  return response;
+};
+
+export const changeUserPermissions = async (
+  permissionId: string | undefined,
+  userEmail: string,
+  subAccountId: string,
+  permission: boolean
+) => {
+  try {
+    const response = await db.permissions.upsert({
+      where: { id: permissionId },
+      update: { access: permission },
+      create: {
+        access: permission,
+        email: userEmail,
+        subAccountId: subAccountId,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.log("🔴Could not change persmission", error);
+  }
+};
+
+export const getSubaccountDetails = async (subaccountId: string) => {
+  const response = await db.subAccount.findUnique({
+    where: {
+      id: subaccountId,
+    },
+  });
+  return response;
+};
+
+export const deleteSubAccount = async (subaccountId: string) => {
+  const response = await db.subAccount.delete({
+    where: {
+      id: subaccountId,
+    },
+  });
   return response;
 };

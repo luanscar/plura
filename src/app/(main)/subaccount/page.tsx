@@ -1,6 +1,7 @@
+type Props = {};
 
-export default function Page() {
-    return (
-        <div>Page</div>
-    )
-}
+const SubAccountPage = (props: Props) => {
+  return <div>SubAccountPage</div>;
+};
+
+export default SubAccountPage;
