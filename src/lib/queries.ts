@@ -30,7 +30,7 @@ export const getAuthUserDetails = async () => {
       Permissions: true,
     },
   });
-  console.log(userData);
+  // console.log(userData, 'queries.ts');
   return userData;
 };
 
@@ -120,21 +120,20 @@ export const saveActivityLogsNotification = async ({
 };
 
 export const createTeamUser = async (agencyId: string, user: User) => {
-  if (user.role === "AGENCY_OWNER") return null;
-  const response = await db.user.create({ data: { ...user } });
-  return response;
-};
+  if (user.role === 'AGENCY_OWNER') return null
+  const response = await db.user.create({ data: { ...user } })
+  return response
+}
 
 export const verifyAndAcceptInvitation = async () => {
-  const user = await currentUser();
-  if (!user) return redirect("/sign-in");
-
+  const user = await currentUser()
+  if (!user) return redirect('/sign-in')
   const invitationExists = await db.invitation.findUnique({
     where: {
       email: user.emailAddresses[0].emailAddress,
-      status: "PENDING",
+      status: 'PENDING',
     },
-  });
+  })
 
   if (invitationExists) {
     const userDetails = await createTeamUser(invitationExists.agencyId, {
@@ -146,38 +145,35 @@ export const verifyAndAcceptInvitation = async () => {
       role: invitationExists.role,
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    })
     await saveActivityLogsNotification({
       agencyId: invitationExists?.agencyId,
       description: `Joined`,
       subaccountId: undefined,
-    });
+    })
 
     if (userDetails) {
       await clerkClient.users.updateUserMetadata(user.id, {
         privateMetadata: {
-          role: userDetails.role || "SUBACCOUNT_USER",
+          role: userDetails.role || 'SUBACCOUNT_USER',
         },
-      });
-    }
+      })
 
-    await db.invitation.delete({
-      where: {
-        email: userDetails?.email,
-      },
-    });
+      await db.invitation.delete({
+        where: { email: userDetails.email },
+      })
 
-    return userDetails?.agencyId;
+      return userDetails.agencyId
+    } else return null
   } else {
     const agency = await db.user.findUnique({
       where: {
         email: user.emailAddresses[0].emailAddress,
       },
-    });
-
-    return agency ? agency.agencyId : null;
+    })
+    return agency ? agency.agencyId : null
   }
-};
+}
 
 export const updateAgencyDetails = async (
   agencyId: string,
@@ -444,11 +440,11 @@ export const deleteSubAccount = async (subaccountId: string) => {
 };
 
 export const deleteUser = async (userId: string) => {
-  await clerkClient.users.updateUserMetadata(userId, {
-    privateMetadata: {
-      role: undefined,
-    },
-  });
+  // await clerkClient.users.updateUserMetadata(userId, {
+  //   privateMetadata: {
+  //     role: undefined,
+  //   },
+  // });
   const deletedUser = await db.user.delete({ where: { id: userId } });
 
   return deletedUser;
